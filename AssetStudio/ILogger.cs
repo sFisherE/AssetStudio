@@ -21,6 +21,23 @@ namespace AssetStudio
 
     public sealed class DummyLogger : ILogger
     {
-        public void Log(LoggerEvent loggerEvent, string message) { }
+        public void Log(LoggerEvent loggerEvent, string message) {
+            switch (loggerEvent)
+            {
+                case LoggerEvent.Verbose:
+                    //break;
+                case LoggerEvent.Debug:
+                    //break;
+                case LoggerEvent.Info:
+                    UnityEngine.Debug.Log(message);
+                    break;
+                case LoggerEvent.Warning:
+                    UnityEngine.Debug.LogWarning(message);
+                    break;
+                case LoggerEvent.Error:
+                    UnityEngine.Debug.LogError(message);
+                    break;
+            }
+        }
     }
 }

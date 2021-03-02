@@ -362,12 +362,20 @@ namespace AssetStudio
         {
             Logger.Info("Process Assets...");
 
+
+            Dictionary<Transform, UnityEngine.Transform> tfLookup = new Dictionary<Transform, UnityEngine.Transform>();
+            Dictionary<UnityEngine.Transform, Transform> tfLookup2 = new Dictionary<UnityEngine.Transform, Transform>();
+            List<UnityEngine.Transform> tfList = new List<UnityEngine.Transform>();
+
             foreach (var assetsFile in assetsFileList)
             {
                 foreach (var obj in assetsFile.Objects)
                 {
                     if (obj is GameObject m_GameObject)
                     {
+                        //unity parse
+                        UnityEngine.GameObject go = new UnityEngine.GameObject();
+                        go.name = m_GameObject.m_Name;
                         foreach (var pptr in m_GameObject.m_Components)
                         {
                             if (pptr.TryGet(out var m_Component))
@@ -376,21 +384,113 @@ namespace AssetStudio
                                 {
                                     case Transform m_Transform:
                                         m_GameObject.m_Transform = m_Transform;
+                                        //unity parse
+                                        Vector3 v1 = m_Transform.m_LocalPosition;
+                                        Quaternion v2 = m_Transform.m_LocalRotation;
+                                        Vector3 v3 = m_Transform.m_LocalScale;
+                                        go.transform.localPosition = new UnityEngine.Vector3(v1.X, v1.Y, v1.Z);
+                                        go.transform.localRotation = new UnityEngine.Quaternion(v2.X,v2.Y,v2.Z,v2.W);
+                                        go.transform.localScale = new UnityEngine.Vector3(v3.X, v3.Y, v3.Z);
+
+                                        tfList.Add(go.transform);
+                                        tfLookup.Add(m_Transform, go.transform);
+                                        tfLookup2.Add(go.transform,m_Transform);
                                         break;
                                     case MeshRenderer m_MeshRenderer:
                                         m_GameObject.m_MeshRenderer = m_MeshRenderer;
+                                        //unity parse
+                                        var meshRenderer = go.AddComponent<UnityEngine.MeshRenderer>();
+
                                         break;
                                     case MeshFilter m_MeshFilter:
                                         m_GameObject.m_MeshFilter = m_MeshFilter;
+
+                                        //unity parse
+                                        var filter = go.AddComponent<UnityEngine.MeshFilter>();
+
+                                        {
+                                            if (m_MeshFilter.m_Mesh.TryGet(out var mesh))
+                                            {
+                                                SubMesh[] subMesh = mesh.m_SubMeshes;
+                                                UnityEngine.Mesh unityMesh = new UnityEngine.Mesh();
+                                                unityMesh.name = mesh.m_Name;
+                                                float[] v = mesh.m_Vertices;
+                                                unityMesh.vertices = Utility.FloatArray2Vector3Array(v);
+
+                                                List<uint> vi = mesh.m_Indices;
+
+                                                int[] array2 = new int[vi.Count];
+                                                for (int i = 0; i < vi.Count; i++)
+                                                {
+                                                    array2[i] = (int)vi[i];
+                                                }
+                                                unityMesh.triangles = array2;
+                                                unityMesh.RecalculateNormals();
+                                                unityMesh.UploadMeshData(false);
+
+                                                filter.sharedMesh = unityMesh;
+                                            }
+                                        }
+                                       
+
                                         break;
                                     case SkinnedMeshRenderer m_SkinnedMeshRenderer:
                                         m_GameObject.m_SkinnedMeshRenderer = m_SkinnedMeshRenderer;
+
+                                        var skinnedMeshRenderer = go.AddComponent<UnityEngine.SkinnedMeshRenderer>();
+                                        {
+                                            if (m_SkinnedMeshRenderer.m_Mesh.TryGet(out var mesh))
+                                            {
+                                                SubMesh[] subMesh = mesh.m_SubMeshes;
+                                                UnityEngine.Mesh unityMesh = new UnityEngine.Mesh();
+                                                unityMesh.name = mesh.m_Name;
+                                                float[] v = mesh.m_Vertices;
+                                                unityMesh.vertices = Utility.FloatArray2Vector3Array(v);
+
+                                                List<uint> vi = mesh.m_Indices;
+
+                                                int[] array2 = new int[vi.Count];
+                                                for (int i = 0; i < vi.Count; i++)
+                                                {
+                                                    array2[i] = (int)vi[i];
+                                                }
+                                                unityMesh.triangles = array2;
+                                                unityMesh.RecalculateNormals();
+                                                unityMesh.UploadMeshData(false);
+
+                                                skinnedMeshRenderer.sharedMesh = unityMesh;
+                                            }
+                                        }
+
                                         break;
                                     case Animator m_Animator:
                                         m_GameObject.m_Animator = m_Animator;
+
+                                        var animator = go.AddComponent<UnityEngine.Animator>();
+
                                         break;
                                     case Animation m_Animation:
                                         m_GameObject.m_Animation = m_Animation;
+                                        var animation = go.AddComponent<UnityEngine.Animation>();
+                                        break;
+
+                                    case MonoBehaviour m_MonoBehaviour:
+                                        var cmp = go.AddComponent<DumpedBehaviour>();
+
+                                        if (m_MonoBehaviour.m_Script.TryGet(out var script))
+                                        {
+                                            if (!string.IsNullOrEmpty(script.m_Namespace))
+                                            {
+                                                cmp.m_Name = string.Format("{0}.{1}.{2}", script.m_AssemblyName, script.m_Namespace, script.m_ClassName);
+                                            }
+                                            else
+                                            {
+                                                cmp.m_Name = string.Format("{0}.{2}", script.m_AssemblyName, script.m_Namespace, script.m_ClassName);
+                                            }
+                                        }
+                                        break;
+                                    default:
+         
                                         break;
                                 }
                             }
@@ -410,6 +510,30 @@ namespace AssetStudio
                         }
                     }
                 }
+            }
+
+            foreach(var item in tfLookup2)
+            {
+                var unityTf = item.Key;
+                var parsedTf = item.Value;
+
+                if (parsedTf.m_Father.TryGet(out var father))
+                {
+                    UnityEngine.Vector3 pre1 = unityTf.transform.localPosition;
+                    UnityEngine.Quaternion pre2 = unityTf.transform.localRotation;
+                    UnityEngine.Vector3 pre3 = unityTf.transform.localScale;
+                    unityTf.parent = tfLookup[father];
+                    unityTf.localPosition = pre1;
+                    unityTf.localRotation = pre2;
+                    unityTf.localScale = pre3;
+                }
+
+                //var find = tfLookup[parsedTf.m_Father];
+                //if (find != null)
+                //{
+                //    pptr.TryGet(out var m_Component)
+                //}
+
             }
         }
     }
