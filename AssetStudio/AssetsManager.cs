@@ -365,7 +365,6 @@ namespace AssetStudio
 
             Dictionary<Transform, UnityEngine.Transform> tfLookup = new Dictionary<Transform, UnityEngine.Transform>();
             Dictionary<UnityEngine.Transform, Transform> tfLookup2 = new Dictionary<UnityEngine.Transform, Transform>();
-            List<UnityEngine.Transform> tfList = new List<UnityEngine.Transform>();
 
             foreach (var assetsFile in assetsFileList)
             {
@@ -392,7 +391,6 @@ namespace AssetStudio
                                         go.transform.localRotation = new UnityEngine.Quaternion(v2.X,v2.Y,v2.Z,v2.W);
                                         go.transform.localScale = new UnityEngine.Vector3(v3.X, v3.Y, v3.Z);
 
-                                        tfList.Add(go.transform);
                                         tfLookup.Add(m_Transform, go.transform);
                                         tfLookup2.Add(go.transform,m_Transform);
                                         break;
@@ -400,35 +398,17 @@ namespace AssetStudio
                                         m_GameObject.m_MeshRenderer = m_MeshRenderer;
                                         //unity parse
                                         var meshRenderer = go.AddComponent<UnityEngine.MeshRenderer>();
-
+                                        meshRenderer.sharedMaterials = m_MeshRenderer.UnityMaterials;
                                         break;
                                     case MeshFilter m_MeshFilter:
                                         m_GameObject.m_MeshFilter = m_MeshFilter;
 
                                         //unity parse
                                         var filter = go.AddComponent<UnityEngine.MeshFilter>();
-
                                         {
                                             if (m_MeshFilter.m_Mesh.TryGet(out var mesh))
                                             {
-                                                SubMesh[] subMesh = mesh.m_SubMeshes;
-                                                UnityEngine.Mesh unityMesh = new UnityEngine.Mesh();
-                                                unityMesh.name = mesh.m_Name;
-                                                float[] v = mesh.m_Vertices;
-                                                unityMesh.vertices = Utility.FloatArray2Vector3Array(v);
-
-                                                List<uint> vi = mesh.m_Indices;
-
-                                                int[] array2 = new int[vi.Count];
-                                                for (int i = 0; i < vi.Count; i++)
-                                                {
-                                                    array2[i] = (int)vi[i];
-                                                }
-                                                unityMesh.triangles = array2;
-                                                unityMesh.RecalculateNormals();
-                                                unityMesh.UploadMeshData(false);
-
-                                                filter.sharedMesh = unityMesh;
+                                                filter.sharedMesh = mesh.UnityMesh;
                                             }
                                         }
                                        
@@ -441,25 +421,9 @@ namespace AssetStudio
                                         {
                                             if (m_SkinnedMeshRenderer.m_Mesh.TryGet(out var mesh))
                                             {
-                                                SubMesh[] subMesh = mesh.m_SubMeshes;
-                                                UnityEngine.Mesh unityMesh = new UnityEngine.Mesh();
-                                                unityMesh.name = mesh.m_Name;
-                                                float[] v = mesh.m_Vertices;
-                                                unityMesh.vertices = Utility.FloatArray2Vector3Array(v);
-
-                                                List<uint> vi = mesh.m_Indices;
-
-                                                int[] array2 = new int[vi.Count];
-                                                for (int i = 0; i < vi.Count; i++)
-                                                {
-                                                    array2[i] = (int)vi[i];
-                                                }
-                                                unityMesh.triangles = array2;
-                                                unityMesh.RecalculateNormals();
-                                                unityMesh.UploadMeshData(false);
-
-                                                skinnedMeshRenderer.sharedMesh = unityMesh;
+                                                skinnedMeshRenderer.sharedMesh = mesh.UnityMesh;
                                             }
+                                            skinnedMeshRenderer.sharedMaterials = m_SkinnedMeshRenderer.UnityMaterials;
                                         }
 
                                         break;

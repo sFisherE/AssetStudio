@@ -472,6 +472,46 @@ namespace AssetStudio
 
         public List<uint> m_Indices = new List<uint>();
 
+        public UnityEngine.Mesh m_UnityMesh;
+        public UnityEngine.Mesh UnityMesh
+        {
+            get
+            {
+                if (m_UnityMesh == null)
+                {
+                    Exporter.TryExportFile("Assets/tmp/Mesh", this.m_Name, ".asset", out var exportFullPath);
+                    m_UnityMesh = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Mesh>(exportFullPath);
+                    if (m_UnityMesh != null)
+                        return m_UnityMesh;
+
+                    m_UnityMesh = new UnityEngine.Mesh();
+                    m_UnityMesh.name = m_Name;
+                    float[] v = m_Vertices;
+                    m_UnityMesh.vertices = Utility.FloatArray2Vector3Array(v);
+
+                    List<uint> vi = m_Indices;
+
+                    int[] array2 = new int[vi.Count];
+                    for (int i = 0; i < vi.Count; i++)
+                    {
+                        array2[i] = (int)vi[i];
+                    }
+                    m_UnityMesh.triangles = array2;
+                    if (this.m_UV0 != null)
+                    {
+                        m_UnityMesh.uv = Utility.FloatArray2Vector2Array(this.m_UV0);
+                    }
+                    m_UnityMesh.RecalculateNormals();
+                    m_UnityMesh.UploadMeshData(false);
+
+                    UnityEditor.AssetDatabase.CreateAsset(m_UnityMesh, exportFullPath);
+                    UnityEditor.AssetDatabase.ImportAsset(exportFullPath, UnityEditor.ImportAssetOptions.Default);
+                    m_UnityMesh = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Mesh>(exportFullPath);
+                }
+                return m_UnityMesh;
+            }
+        }
+
         public Mesh(ObjectReader reader) : base(reader)
         {
             if (version[0] < 3 || (version[0] == 3 && version[1] < 5)) //3.5 down

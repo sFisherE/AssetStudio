@@ -63,6 +63,64 @@ namespace AssetStudio
         public ResourceReader image_data;
         public StreamingInfo m_StreamData;
 
+        public UnityEngine.Texture m_UnityTexture;
+        public override UnityEngine.Texture UnityTexture
+        {
+            get
+            {
+                if (m_UnityTexture == null)
+                {
+                    var ext = "PNG";// Properties.Settings.Default.convertType;
+                    Exporter.TryExportFile("Assets/tmp/Texture2D", this.m_Name, "." + ext.ToLower(), out var exportFullPath);
+
+                    UnityEngine.Debug.Log(this.m_Name+": "+exportFullPath);
+                    m_UnityTexture = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(exportFullPath);
+                    if (m_UnityTexture != null)
+                        return m_UnityTexture;
+
+                    var bitmap = this.ConvertToBitmap(true);
+                    if (bitmap == null)
+                        return null;
+                    System.Drawing.Imaging.ImageFormat format = null;
+                    bool tga = false;
+                    switch (ext)
+                    {
+                        case "BMP":
+                            format = System.Drawing.Imaging.ImageFormat.Bmp;
+                            break;
+                        case "PNG":
+                            format = System.Drawing.Imaging.ImageFormat.Png;
+                            break;
+                        case "JPEG":
+                            format = System.Drawing.Imaging.ImageFormat.Jpeg;
+                            break;
+                        case "TGA":
+                            tga = true;
+                            break;
+                    }
+
+                    //if (!Exporter.TryExportFile("Assets/tmp/Texture2D", this.m_Name, "." + ext.ToLower(), out var exportFullPath))
+                    //    return null;
+                    //if (tga)
+                    //{
+                    //    var file = new TGA(bitmap);
+                    //    file.Save(exportFullPath);
+                    //}
+                    //else
+                    //{
+                        bitmap.Save(exportFullPath, format);
+                    //}
+                    bitmap.Dispose();
+
+                    UnityEditor.AssetDatabase.ImportAsset(exportFullPath, UnityEditor.ImportAssetOptions.Default);
+                    //UnityEditor.AssetDatabase.Refresh();
+                    m_UnityTexture = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(exportFullPath);
+                }
+
+                return m_UnityTexture;
+            }
+        }
+
         public Texture2D(ObjectReader reader) : base(reader)
         {
             m_Width = reader.ReadInt32();

@@ -8,6 +8,18 @@ namespace AssetStudio
         public Vector2 m_Scale;
         public Vector2 m_Offset;
 
+        public UnityEngine.Texture UnityTexture
+        {
+            get
+            {
+                if (m_Texture.TryGet(out var texture))
+                {
+                    return texture.UnityTexture;
+                }
+                return null;
+            }
+        }
+
         public UnityTexEnv(ObjectReader reader)
         {
             m_Texture = new PPtr<Texture>(reader);
@@ -51,6 +63,24 @@ namespace AssetStudio
     {
         public PPtr<Shader> m_Shader;
         public UnityPropertySheet m_SavedProperties;
+
+        public UnityEngine.Material m_UnityMaterial;
+        public UnityEngine.Material UnityMaterial
+        {
+            get
+            {
+                if (m_UnityMaterial == null)
+                {
+                    m_UnityMaterial = new UnityEngine.Material(UnityEngine.Shader.Find("Unlit/Transparent"));
+
+                    foreach(var item in m_SavedProperties.m_TexEnvs)
+                    {
+                        m_UnityMaterial.SetTexture(item.Key, item.Value.UnityTexture);
+                    }
+                }
+                return m_UnityMaterial;
+            }
+        }
 
         public Material(ObjectReader reader) : base(reader)
         {

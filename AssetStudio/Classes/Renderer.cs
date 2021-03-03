@@ -23,6 +23,26 @@ namespace AssetStudio
         public StaticBatchInfo m_StaticBatchInfo;
         public uint[] m_SubsetIndices;
 
+        public UnityEngine.Material[] m_UnityMaterials;
+        public UnityEngine.Material[] UnityMaterials
+        {
+            get
+            {
+                if (m_UnityMaterials == null)
+                {
+                    m_UnityMaterials = new UnityEngine.Material[m_Materials.Length];
+                    for(int i=0;i< m_UnityMaterials.Length; i++)
+                    {
+                        if (m_Materials[i].TryGet(out var mat))
+                        {
+                            m_UnityMaterials[i] = mat.UnityMaterial;
+                        }
+                    }
+                }
+                return m_UnityMaterials;
+            }
+        }
+
         protected Renderer(ObjectReader reader) : base(reader)
         {
             if (version[0] < 5) //5.0 down
