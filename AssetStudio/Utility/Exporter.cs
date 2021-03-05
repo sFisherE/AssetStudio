@@ -18,20 +18,20 @@ namespace AssetStudio
         }
         public static bool TryExportFile(string dir, string fileName, string extension, out string fullPath)
         {
+            //string basePath = string.Format("Assets/{0}/", ProjectInfo.dumpFolder);
             fileName = FixFileName(fileName);
-            fullPath = Path.Combine(dir, fileName + extension);
-            if (!File.Exists(fullPath))
-            {
+            dir = ProjectInfo.dumpFolder + dir;
+            fullPath = Path.Combine( dir, fileName + extension);
+            if(!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
-                return true;
-            }
+
             fullPath = Path.Combine(dir, fileName/* + item.UniqueID*/ + extension);
-            if (!File.Exists(fullPath))
-            {
-                Directory.CreateDirectory(dir);
-                return true;
-            }
-            return false;
+            //if (!File.Exists(fullPath))
+            //{
+            //    Directory.CreateDirectory(dir);
+            //    return true;
+            //}
+            return true;
         }
     }
 }

@@ -477,9 +477,11 @@ namespace AssetStudio
         {
             get
             {
+                if (!ProjectInfo.dumpRes) return null;
                 if (m_UnityMesh == null)
                 {
-                    Exporter.TryExportFile("Assets/tmp/Mesh", this.m_Name, ".asset", out var exportFullPath);
+                    if (string.IsNullOrEmpty(this.m_Name)) return null;
+                    Exporter.TryExportFile("Mesh", this.m_Name, ".asset", out var exportFullPath);
                     m_UnityMesh = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Mesh>(exportFullPath);
                     if (m_UnityMesh != null)
                         return m_UnityMesh;

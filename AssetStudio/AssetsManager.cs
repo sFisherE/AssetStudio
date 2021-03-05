@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -375,6 +376,11 @@ namespace AssetStudio
                         //unity parse
                         UnityEngine.GameObject go = new UnityEngine.GameObject();
                         go.name = m_GameObject.m_Name;
+
+                       var goCmp= go.AddComponent<DumpedGameObject>();
+                        goCmp.m_PathID = obj.m_PathID;
+
+
                         foreach (var pptr in m_GameObject.m_Components)
                         {
                             if (pptr.TryGet(out var m_Component))
@@ -445,12 +451,26 @@ namespace AssetStudio
                                         {
                                             if (!string.IsNullOrEmpty(script.m_Namespace))
                                             {
-                                                cmp.m_Name = string.Format("{0}.{1}.{2}", script.m_AssemblyName, script.m_Namespace, script.m_ClassName);
+                                                cmp.m_ScriptName = string.Format("{0}.{1}.{2}", script.m_AssemblyName, script.m_Namespace, script.m_ClassName);
                                             }
                                             else
                                             {
-                                                cmp.m_Name = string.Format("{0}.{2}", script.m_AssemblyName, script.m_Namespace, script.m_ClassName);
+                                                cmp.m_ScriptName = string.Format("{0}.{2}", script.m_AssemblyName, script.m_Namespace, script.m_ClassName);
                                             }
+
+                                            var type = m_MonoBehaviour.ToType();
+                                            if (type == null)
+                                            {
+                                                var nodes = m_MonoBehaviour.TypeTreeNodes;
+                                                type = m_MonoBehaviour.ToType(nodes);
+                                            }
+                                            var str = JsonConvert.SerializeObject(type, Formatting.Indented);
+                                            cmp.m_DumpedJson = str;
+
+                                        }
+                                        else
+                                        {
+                                            cmp.m_ScriptName = "null";
                                         }
                                         break;
                                     default:
@@ -491,13 +511,6 @@ namespace AssetStudio
                     unityTf.localRotation = pre2;
                     unityTf.localScale = pre3;
                 }
-
-                //var find = tfLookup[parsedTf.m_Father];
-                //if (find != null)
-                //{
-                //    pptr.TryGet(out var m_Component)
-                //}
-
             }
         }
     }

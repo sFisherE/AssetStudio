@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class DumpedBehaviour : MonoBehaviour
 {
-    public string m_Name;
+    public string m_ScriptName;
+    public string m_DumpedJson;
     // Start is called before the first frame update
     void Start()
     {

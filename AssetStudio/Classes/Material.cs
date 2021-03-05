@@ -69,14 +69,25 @@ namespace AssetStudio
         {
             get
             {
+                if (!ProjectInfo.dumpRes) return null;
                 if (m_UnityMaterial == null)
                 {
-                    m_UnityMaterial = new UnityEngine.Material(UnityEngine.Shader.Find("Unlit/Transparent"));
+                    Exporter.TryExportFile("Material", this.m_Name, ".mat", out var exportFullPath);
+
+                    m_UnityMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Material>(exportFullPath);
+                    if (m_UnityMaterial != null) return m_UnityMaterial;
+
+                    m_UnityMaterial = new UnityEngine.Material(UnityEngine.Shader.Find("Standard"));
 
                     foreach(var item in m_SavedProperties.m_TexEnvs)
                     {
                         m_UnityMaterial.SetTexture(item.Key, item.Value.UnityTexture);
                     }
+
+                    UnityEditor.AssetDatabase.CreateAsset(m_UnityMaterial, exportFullPath);
+                    UnityEditor.AssetDatabase.ImportAsset(exportFullPath, UnityEditor.ImportAssetOptions.Default);
+                    m_UnityMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Material>(exportFullPath);
+
                 }
                 return m_UnityMaterial;
             }
