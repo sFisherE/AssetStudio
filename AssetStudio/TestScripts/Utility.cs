@@ -23,4 +23,14 @@ class Utility
         dest.Free();
         return ret;
     }
+    public static Vector4[] FloatArray2Vector4Array(float[] f)
+    {
+        if (f == null) return null;
+        int count = f.Length /4;
+        Vector4[] ret = new Vector4[count];
+        GCHandle dest = GCHandle.Alloc(ret, GCHandleType.Pinned);
+        Marshal.Copy(f, 0, dest.AddrOfPinnedObject(), f.Length);
+        dest.Free();
+        return ret;
+    }
 }

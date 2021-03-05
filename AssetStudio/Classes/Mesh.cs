@@ -477,7 +477,9 @@ namespace AssetStudio
         {
             get
             {
-                if (!ProjectInfo.dumpRes) return null;
+                bool gen = this.m_Name == "Model_head 1";
+                if(!gen)
+                    if (!ProjectInfo.dumpRes) return null;
                 if (m_UnityMesh == null)
                 {
                     if (string.IsNullOrEmpty(this.m_Name)) return null;
@@ -498,10 +500,52 @@ namespace AssetStudio
                     {
                         array2[i] = (int)vi[i];
                     }
+
+                    if(this.m_SubMeshes!=null)
+                        m_UnityMesh.subMeshCount = this.m_SubMeshes.Length;
+
                     m_UnityMesh.triangles = array2;
                     if (this.m_UV0 != null)
-                    {
                         m_UnityMesh.uv = Utility.FloatArray2Vector2Array(this.m_UV0);
+                    if (this.m_UV1 != null)
+                        m_UnityMesh.uv2 = Utility.FloatArray2Vector2Array(this.m_UV1);
+                    if (this.m_UV2 != null)
+                        m_UnityMesh.uv3 = Utility.FloatArray2Vector2Array(this.m_UV2);
+                    if (this.m_UV3 != null)
+                        m_UnityMesh.uv4 = Utility.FloatArray2Vector2Array(this.m_UV3);
+                    if (this.m_UV4 != null)
+                        m_UnityMesh.uv5 = Utility.FloatArray2Vector2Array(this.m_UV4);
+                    if (this.m_UV5 != null)
+                        m_UnityMesh.uv6 = Utility.FloatArray2Vector2Array(this.m_UV5);
+                    if (this.m_UV6 != null)
+                        m_UnityMesh.uv7 = Utility.FloatArray2Vector2Array(this.m_UV6);
+                    if (this.m_UV7 != null)
+                        m_UnityMesh.uv8 = Utility.FloatArray2Vector2Array(this.m_UV7);
+
+                    if(this.m_Tangents!=null)
+                        m_UnityMesh.tangents= Utility.FloatArray2Vector4Array(this.m_Tangents);
+
+
+
+                    if (m_Skin != null)
+                    {
+                        m_UnityMesh.boneWeights = new UnityEngine.BoneWeight[this.m_Skin.Length];
+                        for(int i = 0; i < m_UnityMesh.boneWeights.Length; i++)
+                        {
+                            m_UnityMesh.boneWeights[i] = new UnityEngine.BoneWeight()
+                            {
+                                weight0 = this.m_Skin[i].weight[0],
+                                weight1 = this.m_Skin[i].weight[0],
+                                weight2 = this.m_Skin[i].weight[0],
+                                weight3 = this.m_Skin[i].weight[0],
+                                boneIndex0 = this.m_Skin[i].boneIndex[0],
+                                boneIndex1 = this.m_Skin[i].boneIndex[0],
+                                boneIndex2 = this.m_Skin[i].boneIndex[0],
+                                boneIndex3 = this.m_Skin[i].boneIndex[0],
+                            };
+
+                        }
+
                     }
                     m_UnityMesh.RecalculateNormals();
                     m_UnityMesh.UploadMeshData(false);
