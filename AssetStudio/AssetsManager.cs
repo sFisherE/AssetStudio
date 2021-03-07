@@ -377,9 +377,8 @@ namespace AssetStudio
                         UnityEngine.GameObject go = new UnityEngine.GameObject();
                         go.name = m_GameObject.m_Name;
 
-                       var goCmp= go.AddComponent<DumpedGameObject>();
+                        var goCmp = go.AddComponent<DumpedGameObject>();
                         goCmp.m_PathID = obj.m_PathID;
-
 
                         foreach (var pptr in m_GameObject.m_Components)
                         {
@@ -457,6 +456,8 @@ namespace AssetStudio
                                             {
                                                 cmp.m_ScriptName = string.Format("{0}.{2}", script.m_AssemblyName, script.m_Namespace, script.m_ClassName);
                                             }
+                                            cmp.m_ClassName = script.m_ClassName;
+                                            cmp.m_PathID = m_MonoBehaviour.m_PathID;
 
                                             var type = m_MonoBehaviour.ToType();
                                             if (type == null)

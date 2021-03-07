@@ -477,13 +477,13 @@ namespace AssetStudio
         {
             get
             {
-                bool gen = this.m_Name == "Model_head 1";
-                if(!gen)
-                    if (!ProjectInfo.dumpRes) return null;
+                if (!ProjectInfo.dumpRes) return null;
                 if (m_UnityMesh == null)
                 {
                     if (string.IsNullOrEmpty(this.m_Name)) return null;
-                    Exporter.TryExportFile("Mesh", this.m_Name, ".asset", out var exportFullPath);
+                    
+                    Exporter.TryExportFile(this.assetsFile.fileName+"/Mesh", this.m_Name, ".asset", out var exportFullPath);
+
                     m_UnityMesh = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Mesh>(exportFullPath);
                     if (m_UnityMesh != null)
                         return m_UnityMesh;
@@ -501,10 +501,16 @@ namespace AssetStudio
                         array2[i] = (int)vi[i];
                     }
 
-                    if(this.m_SubMeshes!=null)
+                    if (this.m_SubMeshes != null)
                         m_UnityMesh.subMeshCount = this.m_SubMeshes.Length;
 
+                    if(m_UnityMesh.subMeshCount>1)
+                    {
+                        UnityEngine.Debug.Log(this.assetsFile.fileName+":"+this.m_Name + " " + m_UnityMesh.subMeshCount.ToString());
+                    }
+
                     m_UnityMesh.triangles = array2;
+                    
                     if (this.m_UV0 != null)
                         m_UnityMesh.uv = Utility.FloatArray2Vector2Array(this.m_UV0);
                     if (this.m_UV1 != null)
