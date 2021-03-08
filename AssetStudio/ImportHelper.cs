@@ -79,6 +79,7 @@ namespace AssetStudio
                 case "UnityRaw":
                 case "UnityArchive":
                 case "UnityFS":
+                case "KuroUnityFS":
                     return FileType.BundleFile;
                 case "UnityWebData1.0":
                     return FileType.WebFile;

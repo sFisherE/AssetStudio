@@ -12,6 +12,19 @@ namespace AssetStudio
         public EndianBinaryReader reader;
         public string fullName;
         public string originalPath;
+        public string m_OriginalFileName;
+        public string OriginalFileName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(m_OriginalFileName))
+                {
+                    int index = originalPath.Replace('\\', '/').LastIndexOf('/');
+                    m_OriginalFileName = originalPath.Substring(index + 1);
+                }
+                return m_OriginalFileName;
+            }
+        }
         public string fileName;
         public int[] version = { 0, 0, 0, 0 };
         public BuildType buildType;

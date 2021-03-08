@@ -23,6 +23,16 @@ namespace AssetStudio
         public StaticBatchInfo m_StaticBatchInfo;
         public uint[] m_SubsetIndices;
 
+        public static UnityEngine.Material s_CommonUnityMaterial;
+        public static UnityEngine.Material CommonUnityMaterial
+        {
+            get
+            {
+                if (s_CommonUnityMaterial == null)
+                    s_CommonUnityMaterial= new UnityEngine.Material(UnityEngine.Shader.Find("Standard"));
+                return s_CommonUnityMaterial;
+            }
+        }
         public UnityEngine.Material[] m_UnityMaterials;
         public UnityEngine.Material[] UnityMaterials
         {
@@ -30,12 +40,27 @@ namespace AssetStudio
             {
                 if (m_UnityMaterials == null)
                 {
-                    m_UnityMaterials = new UnityEngine.Material[m_Materials.Length];
-                    for(int i=0;i< m_UnityMaterials.Length; i++)
+                    if (m_Materials.Length > 0)
                     {
-                        if (m_Materials[i].TryGet(out var mat))
+                        m_UnityMaterials = new UnityEngine.Material[m_Materials.Length];
+                        for (int i = 0; i < m_UnityMaterials.Length; i++)
                         {
-                            m_UnityMaterials[i] = mat.UnityMaterial;
+                            if (m_Materials[i].TryGet(out var mat))
+                            {
+                                m_UnityMaterials[i] = mat.UnityMaterial;
+                            }
+                            else
+                            {
+                                m_UnityMaterials[i] = CommonUnityMaterial;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        m_UnityMaterials = new UnityEngine.Material[1];
+                        for (int i = 0; i < m_UnityMaterials.Length; i++)
+                        {
+                            m_UnityMaterials[i] = CommonUnityMaterial;
                         }
                     }
                 }

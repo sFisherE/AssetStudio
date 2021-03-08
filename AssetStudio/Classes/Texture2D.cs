@@ -71,7 +71,7 @@ namespace AssetStudio
                 if (!ProjectInfo.dumpRes) return null;
                 if (m_UnityTexture == null)
                 {
-                    Exporter.TryExportFile(this.assetsFile.fileName + "/Texture2D", this.m_Name, ".png", out var exportFullPath);
+                    Exporter.TryExportFile(this.assetsFile.OriginalFileName + "/" + this.assetsFile.fileName + "/Texture2D", this.m_Name, ".png", out var exportFullPath);
                     m_UnityTexture = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(exportFullPath);
                     if (m_UnityTexture != null)
                         return m_UnityTexture;

@@ -72,7 +72,7 @@ namespace AssetStudio
                 if (!ProjectInfo.dumpRes) return null;
                 if (m_UnityMaterial == null)
                 {
-                    Exporter.TryExportFile(this.assetsFile.fileName + "/Material", this.m_Name, ".mat", out var exportFullPath);
+                    Exporter.TryExportFile(this.assetsFile.OriginalFileName + "/" + this.assetsFile.fileName + "/Material", this.m_Name, ".mat", out var exportFullPath);
 
                     m_UnityMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Material>(exportFullPath);
                     if (m_UnityMaterial != null) return m_UnityMaterial;

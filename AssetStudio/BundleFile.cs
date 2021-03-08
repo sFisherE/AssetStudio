@@ -65,6 +65,7 @@ namespace AssetStudio
                         ReadFiles(blocksStream, path);
                     }
                     break;
+                case "KuroUnityFS":
                 case "UnityFS":
                     ReadHeader(reader);
                     ReadBlocksInfoAndDirectory(reader);
@@ -198,7 +199,7 @@ namespace AssetStudio
             m_Header.flags = reader.ReadUInt32();
             if (m_Header.signature != "UnityFS")
             {
-                reader.ReadByte();
+                //reader.ReadByte();
             }
         }
 

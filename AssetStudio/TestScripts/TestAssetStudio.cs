@@ -25,9 +25,21 @@ class TestAssetStudio : MonoBehaviour
     private void Load()
     {
         ProjectInfo.dumpRes = dumpRes;
-            ProjectInfo.projectName = projectName;
+        ProjectInfo.projectName = projectName;
+
+
         if (string.IsNullOrEmpty(folderName))
+        {
+            var array = new string[filePath.Length];
+            for (int i = 0; i < filePath.Length; i++)
+            {
+                array[i] = Path.Combine(folderName, filePath[i]);
+                Debug.Log("loading:" + array[i]);
+            }
+            assetsManager.LoadFiles(array);
+            AssetDatabase.Refresh();
             return;
+        }
         if (m_IsLoadLevel)
         {
             var array = new string[m_EndLevelIndex - m_StartLevelIndex + 1];
@@ -43,16 +55,7 @@ class TestAssetStudio : MonoBehaviour
 
         if (filePath.Length == 0)
             assetsManager.LoadFolder(folderName);
-        else
-        {
-            var array = new string[filePath.Length];
-            for (int i = 0; i < filePath.Length; i++)
-            {
-                array[i] = Path.Combine(folderName, filePath[i]);
-                Debug.Log("loading:" + array[i]);
-            }
-            assetsManager.LoadFiles(array);
-        }
+
         AssetDatabase.Refresh();
 
     }

@@ -482,7 +482,7 @@ namespace AssetStudio
                 {
                     if (string.IsNullOrEmpty(this.m_Name)) return null;
                     
-                    Exporter.TryExportFile(this.assetsFile.fileName+"/Mesh", this.m_Name, ".asset", out var exportFullPath);
+                    Exporter.TryExportFile(this.assetsFile.OriginalFileName +"/"+this.assetsFile.fileName+"/Mesh", this.m_Name, ".asset", out var exportFullPath);
 
                     m_UnityMesh = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Mesh>(exportFullPath);
                     if (m_UnityMesh != null)
@@ -517,16 +517,16 @@ namespace AssetStudio
                         m_UnityMesh.uv2 = Utility.FloatArray2Vector2Array(this.m_UV1);
                     if (this.m_UV2 != null)
                         m_UnityMesh.uv3 = Utility.FloatArray2Vector2Array(this.m_UV2);
-                    if (this.m_UV3 != null)
-                        m_UnityMesh.uv4 = Utility.FloatArray2Vector2Array(this.m_UV3);
-                    if (this.m_UV4 != null)
-                        m_UnityMesh.uv5 = Utility.FloatArray2Vector2Array(this.m_UV4);
-                    if (this.m_UV5 != null)
-                        m_UnityMesh.uv6 = Utility.FloatArray2Vector2Array(this.m_UV5);
-                    if (this.m_UV6 != null)
-                        m_UnityMesh.uv7 = Utility.FloatArray2Vector2Array(this.m_UV6);
-                    if (this.m_UV7 != null)
-                        m_UnityMesh.uv8 = Utility.FloatArray2Vector2Array(this.m_UV7);
+                    //if (this.m_UV3 != null)
+                    //    m_UnityMesh.uv4 = Utility.FloatArray2Vector2Array(this.m_UV3);
+                    //if (this.m_UV4 != null)
+                    //    m_UnityMesh.uv5 = Utility.FloatArray2Vector2Array(this.m_UV4);
+                    //if (this.m_UV5 != null)
+                    //    m_UnityMesh.uv6 = Utility.FloatArray2Vector2Array(this.m_UV5);
+                    //if (this.m_UV6 != null)
+                    //    m_UnityMesh.uv7 = Utility.FloatArray2Vector2Array(this.m_UV6);
+                    //if (this.m_UV7 != null)
+                    //    m_UnityMesh.uv8 = Utility.FloatArray2Vector2Array(this.m_UV7);
 
                     if(this.m_Tangents!=null)
                         m_UnityMesh.tangents= Utility.FloatArray2Vector4Array(this.m_Tangents);
